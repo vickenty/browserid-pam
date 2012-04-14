@@ -1,0 +1,9 @@
+script(src='https://dev.diresworb.org/provisioning_api.js')
+script(src="/javascripts/prov.js")
+if email
+  script
+    prov('#{email}')
+else
+  script
+    prov(undefined)
+

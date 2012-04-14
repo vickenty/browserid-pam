@@ -2,5 +2,20 @@
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-  body!= body
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
+    script(src='/javascripts/bootstrap.min.js')
+  body
+    div.container
+      h1= title
+
+      - var classes = ['success', 'error', 'info']
+      each className in classes
+        - var alerts = flash(className)
+        - var itemClasses = [ "alert", "alert-" + className ]
+        each alert in alerts
+          div(class=itemClasses)
+            a.close(data-dismiss='close') ×
+            = alert
+
+      div!= body

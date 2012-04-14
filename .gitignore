@@ -1,0 +1,4 @@
+key.publickey
+key.secretkey
+*.pem
+*~

@@ -4,19 +4,75 @@
  */
 
 var express = require('express')
+  , nconf = require('nconf')
+  , fs = require('fs')
+  , jwk = require('jwcrypto/jwk')
+  , ini = require('ini')
   , routes = require('./routes');
 
-var app = module.exports = express.createServer();
+// Load configuration
+
+nconf.argv().env();
+
+if (nconf.get('config')) {
+  nconf.file({file: nconf.get('config'), format: ini});
+}
+
+nconf.defaults({
+    url: {
+      auth: '/browserid/auth'
+    , prov: '/browserid/prov'
+  }
+  , port: 3000
+  , key: {
+      publickey: 'key.publickey'
+    , secretkey: 'key.secretkey'
+  }
+  , ssl: {
+      cert: 'cert.pem'
+    , key: 'privkey.pem'
+  }
+  , pam: {
+    service_name: 'browserid'
+  }
+  , cert: {
+    lifetime: 43200000
+  }
+});
+
+var app = module.exports = express.createServer({
+    cert: fs.readFileSync(nconf.get('ssl:cert'))
+  , key: fs.readFileSync(nconf.get('ssl:key'))
+});
 
 // Configuration
 
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
+  app.use(express.logger());
   app.use(express.bodyParser());
+  app.use(express.cookieParser());
+  app.use(express.session({secret: nconf.get('secret')}));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
+
+  app.dynamicHelpers({
+    flash: function(req, res) {
+      return function(className) {
+        return req.flash(className);
+      }
+    }
+  });
+
+  app.set('key.publickey', JSON.parse(fs.readFileSync(nconf.get('key:publickey'))));
+  app.set('key.secretkey', jwk.SecretKey.deserialize(fs.readFileSync(nconf.get('key:secretkey'))));
+  app.set('cert.lifetime', nconf.get('cert:lifetime'));
+  app.set('pam.service', nconf.get('pam:service'));
+  app.set('domain', nconf.get('domain'));
+  app.set('url.auth', nconf.get('url:auth'));
+  app.set('url.prov', nconf.get('url:prov'));
 });
 
 app.configure('development', function(){
@@ -30,7 +86,14 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', routes.index);
+app.get('/.well-known/browserid', routes.support);
+app.get(nconf.get('url:auth'), routes.auth);
+app.post(nconf.get('url:auth'), routes.do_auth);
+app.get(nconf.get('url:prov'), routes.prov);
+app.post(nconf.get('url:prov'), routes.sign);
 
-app.listen(3000, function(){
+// Launch
+
+app.listen(nconf.get('port'), function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 });
