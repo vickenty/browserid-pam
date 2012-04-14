@@ -97,6 +97,6 @@ app.post(nconf.get('url:prov'), routes.sign);
 
 // Launch
 
-app.listen(nconf.get('port'), function(){
+app.listen(nconf.get('port'), nconf.get('bind'), function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 });
