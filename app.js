@@ -28,10 +28,6 @@ nconf.defaults({
       publickey: 'key.publickey'
     , secretkey: 'key.secretkey'
   }
-  , ssl: {
-      cert: 'cert.pem'
-    , key: 'privkey.pem'
-  }
   , pam: {
     service_name: 'browserid'
   }
@@ -40,10 +36,17 @@ nconf.defaults({
   }
 });
 
-var app = module.exports = express.createServer({
+// Create application
+
+var server_options = [];
+if (nconf.get('ssl:cert')) {
+  server_options.push({
     cert: fs.readFileSync(nconf.get('ssl:cert'))
   , key: fs.readFileSync(nconf.get('ssl:key'))
-});
+  });
+}
+
+var app = module.exports = express.createServer.apply(express, server_options);
 
 // Configuration
 
