@@ -34,6 +34,11 @@ nconf.defaults({
   , cert: {
     lifetime: 43200000
   }
+  , browserid_host_defaults: {
+      development: 'dev.diresworb.org'
+    , staging: 'diresworb.org'
+    , production: 'browserid.org'
+  }
 });
 
 // Create application
@@ -67,6 +72,12 @@ app.configure(function(){
         return req.flash(className);
       }
     }
+  , auth_api_js: function(req, res) {
+      return req.app.set('js.auth_api');
+    }
+  , prov_api_js: function(req, res) {
+      return req.app.set('js.prov_api');
+    }
   });
 
   app.set('key.publickey', JSON.parse(fs.readFileSync(nconf.get('key:publickey'))));
@@ -76,6 +87,16 @@ app.configure(function(){
   app.set('domain', nconf.get('domain'));
   app.set('url.auth', nconf.get('url:auth'));
   app.set('url.prov', nconf.get('url:prov'));
+
+  var browserid_host = nconf.get('browserid_host');
+  if (!browserid_host) {
+    browserid_host = nconf.get('browserid_host_defaults:' + app.settings.env);
+  }
+  app.set('js.auth_api', 'https://' + browserid_host + '/authentication_api.js');
+  app.set('js.prov_api', 'https://' + browserid_host + '/provisioning_api.js');
+
+  console.log(app.set('js.auth_api'));
+  console.log(app.set('js.prov_api'));
 });
 
 app.configure('development', function(){
