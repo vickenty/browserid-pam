@@ -2,8 +2,8 @@ script(src=prov_api_js)
 script(src="/javascripts/prov.js")
 if email
   script
-    prov('#{email}')
+    prov('#{email}', '#{prov_url}')
 else
   script
-    prov(undefined)
+    prov(undefined, '#{prov_url}')
 

@@ -1,22 +1,16 @@
-script(src=auth_api_js)
 script(src='/javascripts/auth.js')
 
-if username
-  script
-    navigator.id.completeAuthentication()
+form.form-vertical(method="POST")
+  p
+  if requested
+    p Please enter password for #{requested}
+    input(type='hidden', name='requested', value='#{requested}')
+  else
+    label Username
+      input.span4(name="username", type="text", placeholder="Username", value=username)
+  label Password
+    input.span4(name="password", type="password", placeholder="Password")
 
-  p You are logged in as #{username}.
-else
-  form.form-vertical(method="POST")
-    if requested
-      p Please enter password for #{requested}
-      input(type='hidden', name='username', value='#{requested}')
-    else
-      label Username
-        input.span4(name="username", type="text", placeholder="Username")
-    label Password
-      input.span4(name="password", type="password", placeholder="Password")
-    
-    button.btn.btn-primary(type="submit") Sign in
-    &nbsp;
-    button.btn.cancel Cancel
+  button.btn.btn-primary(type="submit") Sign in
+  &nbsp;
+  button.btn.cancel Cancel

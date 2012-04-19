@@ -1,11 +1,11 @@
-function prov(authName) {
+function prov(authName, prov_url) {
   navigator.id.beginProvisioning(function(email) {
     window.console && console.log(['prov', email, authName]);
     if (authName != email) {
       navigator.id.raiseProvisioningFailure('user is not authenticated as target user')
     } else {
       navigator.id.genKeyPair(function(pubkey) {
-        $.ajax("/.browserid/prov", {
+        $.ajax(prov_url, {
           type: 'post',
           cache: false,
           data: pubkey,

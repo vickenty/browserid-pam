@@ -51,6 +51,11 @@ if (nconf.get('ssl:cert')) {
   });
 }
 
+if (nconf.get('ssl:ca')) {
+  server_options[0].ca = fs.readFileSync(nconf.get('ssl:ca'));
+  server_options[0].requestCert = true;
+}
+
 var app = module.exports = express.createServer.apply(express, server_options);
 
 // Configuration
