@@ -99,9 +99,6 @@ app.configure(function(){
   }
   app.set('js.auth_api', 'https://' + browserid_host + '/authentication_api.js');
   app.set('js.prov_api', 'https://' + browserid_host + '/provisioning_api.js');
-
-  console.log(app.set('js.auth_api'));
-  console.log(app.set('js.prov_api'));
 });
 
 app.configure('development', function(){
